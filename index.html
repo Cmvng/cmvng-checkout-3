@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cmvng SignalVault — Choose Your Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAFAF9;
+    --bg-card: #FFFFFF;
+    --bg-hover: #F5F5F3;
+    --bg-muted: #F0EFED;
+    --border: #E8E6E3;
+    --border-active: #1A1A1A;
+    --text: #1A1A1A;
+    --text-secondary: #6B6560;
+    --text-muted: #A09A93;
+    --accent: #1A1A1A;
+    --green: #22A06B;
+    --green-light: #E6F4EE;
+    --gold: #B8860B;
+    --gold-light: #FDF6E3;
+    --blue: #2775CA;
+    --blue-light: #EBF2FC;
+    --red-soft: #DC6E6E;
+    --red-light: #FDF0F0;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-pill: 100px;
+    --font: 'Outfit', -apple-system, sans-serif;
+    --font-serif: 'Newsreader', Georgia, serif;
+    --font-mono: 'Geist Mono', monospace;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.08);
+    --transition: 0.25s cubic-bezier(0.22,1,0.36,1);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+
+  /* ── Page ── */
+  .page {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* ── Header ── */
+  .header {
+    margin-bottom: 56px;
+    animation: fadeIn 0.6s ease both;
+  }
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 48px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand-mark {
+    width: 32px; height: 32px;
+    background: var(--text);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--bg);
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .brand-name {
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+  }
+  .testnet-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: var(--gold-light);
+    border-radius: var(--radius-pill);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--gold);
+    letter-spacing: 0.03em;
+  }
+  .testnet-pill::before {
+    content: '';
+    width: 5px; height: 5px;
+    background: var(--gold);
+    border-radius: 50%;
+    animation: blink 2s ease infinite;
+  }
+  @keyframes blink {
+    0%,100% { opacity:1; } 50% { opacity:0.3; }
+  }
+
+  .headline {
+    max-width: 520px;
+  }
+  .headline h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  .headline h1 em {
+    font-style: italic;
+  }
+  .headline p {
+    font-size: 15px;
+    color: var(--text-secondary);
+    max-width: 420px;
+    line-height: 1.6;
+  }
+
+  /* ── Signal Explainer ── */
+  .signal-legend {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  .signal-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .badge-t1 {
+    background: var(--green-light);
+    color: var(--green);
+  }
+  .badge-t2 {
+    background: var(--bg-muted);
+    color: var(--text-secondary);
+  }
+  .badge-t1::before, .badge-t2::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+  }
+  .badge-t1::before { background: var(--green); }
+  .badge-t2::before { background: var(--text-muted); }
+
+  /* ── Plans Grid ── */
+  .plans {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 48px;
+    animation: fadeIn 0.6s ease 0.1s both;
+  }
+
+  .plan {
+    position: relative;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    cursor: pointer;
+    transition: all var(--transition);
+    display: flex;
+    flex-direction: column;
+  }
+  .plan:hover {
+    border-color: #D0CDC9;
+    box-shadow: var(--shadow-sm);
+  }
+  .plan.selected {
+    border-color: var(--border-active);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Selection indicator */
+  .plan-check {
+    position: absolute;
+    top: 16px; right: 16px;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    transition: all var(--transition);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .plan.selected .plan-check {
+    background: var(--text);
+    border-color: var(--text);
+  }
+  .plan.selected .plan-check::after {
+    content: '';
+    width: 6px; height: 6px;
+    background: white;
+    border-radius: 50%;
+  }
+
+  .plan-tier {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+  .plan.selected .plan-tier {
+    color: var(--text-secondary);
+  }
+
+  .plan-price {
+    margin-bottom: 4px;
+  }
+  .plan-price .val {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .plan-price .cur {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    margin-left: 2px;
+  }
+  .plan-period {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .plan-divider {
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+    margin: 0 0 16px;
+  }
+
+  .plan-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    margin-bottom: 16px;
+    flex-grow: 1;
+  }
+
+  .plan-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .plan-features li {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.4;
+  }
+  .feat-icon {
+    flex-shrink: 0;
+    width: 16px; height: 16px;
+    margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted);
+  }
+  .plan.selected .feat-icon { color: var(--green); }
+  .feat-icon svg { width: 12px; height: 12px; }
+
+  .signal-type-tag {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    letter-spacing: 0.04em;
+    vertical-align: 1px;
+  }
+  .tag-t1 { background: var(--green-light); color: var(--green); }
+  .tag-t2 { background: var(--bg-muted); color: var(--text-muted); }
+  .tag-both { background: var(--blue-light); color: var(--blue); }
+
+  .popular-flag {
+    position: absolute;
+    top: -1px; left: 50%;
+    transform: translateX(-50%);
+    padding: 3px 12px;
+    background: var(--text);
+    color: var(--bg);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-radius: 0 0 6px 6px;
+  }
+
+  /* ── Payment Card ── */
+  .payment-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    max-width: 480px;
+    margin: 0 auto;
+    animation: fadeIn 0.6s ease 0.2s both;
+  }
+
+  .pay-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .pay-header-left h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .pay-header-left span {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .pay-total {
+    text-align: right;
+  }
+  .pay-total .amount {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .pay-total .denom {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* Steps */
+  .steps-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 28px;
+  }
+  .s-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .s-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: all var(--transition);
+  }
+  .s-step.active .s-num {
+    background: var(--text);
+    border-color: var(--text);
+    color: white;
+  }
+  .s-step.done .s-num {
+    background: var(--green-light);
+    border-color: var(--green);
+    color: var(--green);
+  }
+  .s-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .s-step.active .s-label { color: var(--text); }
+  .s-step.done .s-label { color: var(--green); }
+  .s-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    margin: 0 10px;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--text);
+    color: var(--bg);
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    margin-bottom: 12px;
+  }
+  .btn-primary:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  .btn-outline {
+    width: 100%;
+    padding: 12px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+  .btn-outline:hover {
+    background: var(--bg-hover);
+    border-color: #D0CDC9;
+  }
+
+  .pay-hint {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    line-height: 1.6;
+  }
+  .pay-hint a {
+    color: var(--text-secondary);
+    text-decoration: underline;
+    text-decoration-color: var(--border);
+    text-underline-offset: 2px;
+    transition: text-decoration-color 0.2s;
+  }
+  .pay-hint a:hover { text-decoration-color: var(--text-secondary); }
+
+  /* ── States ── */
+  .state { display: none; }
+  .state.visible { display: block; }
+
+  /* Connected state */
+  .wallet-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--bg-muted);
+    border-radius: var(--radius-sm);
+    margin-bottom: 20px;
+  }
+  .wallet-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .wallet-dot {
+    width: 7px; height: 7px;
+    background: var(--green);
+    border-radius: 50%;
+  }
+  .wallet-addr {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .wallet-bal {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  /* Processing */
+  .processing-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 0;
+  }
+  .loader {
+    width: 36px; height: 36px;
+    border: 2.5px solid var(--border);
+    border-top-color: var(--text);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .processing-view p {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+  .processing-view small {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* Success */
+  .success-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 0;
+    text-align: center;
+  }
+  .success-check {
+    width: 52px; height: 52px;
+    background: var(--green-light);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .success-check svg { width: 22px; height: 22px; color: var(--green); }
+  @keyframes pop {
+    0% { transform: scale(0); } 100% { transform: scale(1); }
+  }
+  .success-view h3 {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    font-weight: 400;
+  }
+  .success-view p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    max-width: 320px;
+    line-height: 1.6;
+  }
+  .tx-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 4px 10px;
+    background: var(--bg-muted);
+    border-radius: var(--radius-pill);
+    transition: color 0.2s;
+  }
+  .tx-link:hover { color: var(--text-secondary); }
+
+  /* ── Free Selected State ── */
+  .free-msg {
+    text-align: center;
+    padding: 32px;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    max-width: 480px;
+    margin: 0 auto;
+    animation: fadeIn 0.4s ease both;
+  }
+  .free-msg h3 {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 400;
+    margin-bottom: 6px;
+  }
+  .free-msg p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+
+  /* ── Network Pill ── */
+  .network-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: var(--bg-muted);
+    border-radius: var(--radius-pill);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+  .network-pill .net-dot {
+    width: 5px; height: 5px;
+    background: var(--green);
+    border-radius: 50%;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    max-width: 480px;
+    margin: 40px auto 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: fadeIn 0.6s ease 0.3s both;
+  }
+  .footer-left {
+    display: flex;
+    gap: 20px;
+  }
+  .footer a {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer a:hover { color: var(--text-secondary); }
+  .footer-right {
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeIn {
+    from { opacity:0; transform:translateY(10px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .plans { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 580px) {
+    .plans { grid-template-columns: 1fr; }
+    .page { padding: 32px 16px 60px; }
+    .payment-card { padding: 24px 20px; }
+    .top-bar { flex-direction: column; align-items: flex-start; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Top Bar -->
+  <header class="header">
+    <div class="top-bar">
+      <div class="brand">
+        <div class="brand-mark">CV</div>
+        <span class="brand-name">Cmvng SignalVault</span>
+      </div>
+      <div class="testnet-pill">Arc Testnet · Beta</div>
+    </div>
+
+    <div class="headline">
+      <h1>Pick the signals<br>that match <em>your</em> edge</h1>
+      <p>Forex & crypto limit-order signals with precise entries, exits, SL and TP — delivered straight to Telegram.</p>
+
+      <div class="signal-legend">
+        <span class="signal-badge badge-t1">T1 — High win-rate</span>
+        <span class="signal-badge badge-t2">T2 — Standard</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Plans -->
+  <div class="plans" id="plansGrid">
+
+    <!-- Free -->
+    <div class="plan" data-tier="free" data-price="0" onclick="selectPlan(this)">
+      <div class="plan-check"></div>
+      <div class="plan-tier">Free</div>
+      <div class="plan-price"><span class="val">$0</span></div>
+      <div class="plan-period">Forever</div>
+      <div class="plan-divider"></div>
+      <p class="plan-desc">Real signals on real profitable pairs — see for yourself that it works.</p>
+      <ul class="plan-features">
+        <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> 1 profitable forex pair (random)</li>
+        <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> 1 profitable crypto pair (random)</li>
+        <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> <span class="signal-type-tag tag-t1">T1</span> + <span class="signal-type-tag tag-t2">T2</span>&nbsp; signals included</li>
+        <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> Entry, SL & TP levels</li>
+        <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> Pairs rotate weekly</li>
+      </ul>
+    </div>
+
+    <!-- Pro -->
+    <div class="plan selected" data-tier="pro" data-price="15" onclick="selectPlan(this)">
+      <div class="plan-check"></div>
+      <div class="popular-flag">Popular</div>
+      <div class="plan-tier">Pro</div>
+      <div class="plan-price"><span class="val">15</span><span class="cur">USDC</span></div>
+      <div class="plan-period">per month</div>
+      <div class="plan-divider"></div>
+      <p class="plan-desc">Real-time quality signals on the pairs that actually make money.</p>
+      <ul class="plan-features">
+        <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> <span class="signal-type-tag tag-t1">T1</span> + <span class="signal-type-tag tag-t2">T2</span>&nbsp; real-time signals</li>
+        <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> Profitable pairs unlocked</li>
+        <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> Entry, SL & TP levels</li>
+        <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> Signal history & win-rate stats</li>
+      </ul>
+    </div>
+
+    <!-- Elite -->
+    <div class="plan" data-tier="elite" data-price="50" onclick="selectPlan(this)">
+      <div class="plan-check"></div>
+      <div class="plan-tier">Elite</div>
+      <div class="plan-price"><span class="val">50</span><span class="cur">USDC</span></div>
+      <div class="plan-period">per month</div>
+      <div class="plan-divider"></div>
+      <p class="plan-desc">Get T1 signals before everyone else, on every pair we track.</p>
+      <ul class="plan-features">
+        <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> Everything in Pro</li>
+        <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> <span class="signal-type-tag tag-t1">T1</span>&nbsp; priority delivery</li>
+        <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> All pairs unlocked</li>
+        <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> Multi-TP scaling targets</li>
+        <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> VIP Telegram group</li>
+      </ul>
+    </div>
+
+    <!-- Institutional -->
+    <div class="plan" data-tier="institutional" data-price="150" onclick="selectPlan(this)">
+      <div class="plan-check"></div>
+      <div class="plan-tier">Institutional</div>
+      <div class="plan-price"><span class="val">150</span><span class="cur">USDC</span></div>
+      <div class="plan-period">per month</div>
+      <div class="plan-divider"></div>
+      <p class="plan-desc">API access, custom pairs, and a direct line for serious capital.</p>
+      <ul class="plan-features">
+        <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> Everything in Elite</li>
+        <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> Signal API access (JSON webhook)</li>
+        <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> Custom pair requests</li>
+        <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> Portfolio risk allocation</li>
+        <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> 1-on-1 direct support</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Payment Area -->
+  <div id="paymentArea">
+
+    <!-- Free Selected -->
+    <div class="free-msg" id="freeMsg" style="display:none;">
+      <h3>You're on Free</h3>
+      <p>Head back to Telegram and start receiving signals. Upgrade anytime.</p>
+      <button class="btn-outline" onclick="window.open('https://t.me/your_bot','_blank')">Open Telegram →</button>
+    </div>
+
+    <!-- Payment Card -->
+    <div class="payment-card" id="payCard">
+
+      <div class="pay-header">
+        <div class="pay-header-left">
+          <h3 id="payTierLabel">Pro Plan</h3>
+          <span>30 days · renew anytime</span>
+        </div>
+        <div class="pay-total">
+          <div class="amount" id="payAmountDisplay">15 <span style="font-size:14px;font-weight:400;color:var(--text-secondary);">USDC</span></div>
+          <div class="denom">on Arc Testnet</div>
+        </div>
+      </div>
+
+      <!-- Steps -->
+      <div class="steps-row">
+        <div class="s-step active" id="s1">
+          <span class="s-num">1</span>
+          <span class="s-label">Connect</span>
+        </div>
+        <div class="s-line"></div>
+        <div class="s-step" id="s2">
+          <span class="s-num">2</span>
+          <span class="s-label">Pay</span>
+        </div>
+        <div class="s-line"></div>
+        <div class="s-step" id="s3">
+          <span class="s-num">3</span>
+          <span class="s-label">Active</span>
+        </div>
+      </div>
+
+      <!-- State: Connect -->
+      <div class="state visible" id="stateConnect">
+        <div class="network-pill">
+          <span class="net-dot"></span>
+          Arc Testnet · 5042002
+        </div>
+        <button class="btn-primary" onclick="connectWallet()">Connect Wallet</button>
+        <p class="pay-hint">
+          MetaMask or any EVM wallet.<br>
+          Need testnet USDC? <a href="https://faucet.circle.com" target="_blank">Get it free →</a>
+        </p>
+      </div>
+
+      <!-- State: Pay -->
+      <div class="state" id="statePay">
+        <div class="wallet-info">
+          <div class="wallet-left">
+            <span class="wallet-dot"></span>
+            <span class="wallet-addr" id="addrDisplay">0x1a2B...9f4E</span>
+          </div>
+          <span class="wallet-bal" id="balDisplay">10.00 USDC</span>
+        </div>
+        <button class="btn-primary" onclick="processPayment()">
+          Pay <span id="payBtnAmount">15</span> USDC
+        </button>
+        <p class="pay-hint">Settles in &lt;1 second on Arc. No gas surprises — fees are in USDC.</p>
+      </div>
+
+      <!-- State: Processing -->
+      <div class="state" id="stateProcessing">
+        <div class="processing-view">
+          <div class="loader"></div>
+          <p>Confirming on Arc...</p>
+          <small>Sub-second finality — almost there</small>
+        </div>
+      </div>
+
+      <!-- State: Success -->
+      <div class="state" id="stateSuccess">
+        <div class="success-view">
+          <div class="success-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12l5 5L19 7"/></svg>
+          </div>
+          <h3>You're in</h3>
+          <p><strong id="successTierName">Pro</strong> is live. Head back to Telegram — signals are already flowing.</p>
+          <a class="tx-link" href="https://testnet.arcscan.app" target="_blank">View on ArcScan ↗</a>
+          <button class="btn-outline" style="margin-top:8px;" onclick="window.open('https://t.me/your_bot','_blank')">Back to Telegram →</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-left">
+      <a href="#">Terms</a>
+      <a href="#">Support</a>
+    </div>
+    <div class="footer-right">
+      Powered by Arc · &lt;1s settlement
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let selectedTier = 'pro';
+  let selectedPrice = 15;
+
+  function selectPlan(el) {
+    document.querySelectorAll('.plan').forEach(p => p.classList.remove('selected'));
+    el.classList.add('selected');
+
+    selectedTier = el.dataset.tier;
+    selectedPrice = parseInt(el.dataset.price);
+
+    const tierNames = { free:'Free', pro:'Pro', elite:'Elite', institutional:'Institutional' };
+
+    if (selectedTier === 'free') {
+      document.getElementById('payCard').style.display = 'none';
+      document.getElementById('freeMsg').style.display = 'block';
+    } else {
+      document.getElementById('payCard').style.display = 'block';
+      document.getElementById('freeMsg').style.display = 'none';
+
+      document.getElementById('payTierLabel').textContent = tierNames[selectedTier] + ' Plan';
+      document.getElementById('payAmountDisplay').innerHTML = selectedPrice + ' <span style="font-size:14px;font-weight:400;color:var(--text-secondary);">USDC</span>';
+      document.getElementById('payBtnAmount').textContent = selectedPrice;
+
+      // Reset to connect state
+      showState('stateConnect');
+      resetSteps();
+    }
+  }
+
+  function showState(id) {
+    document.querySelectorAll('.state').forEach(s => s.classList.remove('visible'));
+    document.getElementById(id).classList.add('visible');
+  }
+
+  function resetSteps() {
+    ['s1','s2','s3'].forEach(s => {
+      document.getElementById(s).classList.remove('active','done');
+    });
+    document.getElementById('s1').classList.add('active');
+  }
+
+  function stepTo(num) {
+    ['s1','s2','s3'].forEach((s, i) => {
+      const el = document.getElementById(s);
+      el.classList.remove('active','done');
+      if (i + 1 < num) el.classList.add('done');
+      if (i + 1 === num) el.classList.add('active');
+    });
+  }
+
+  // ══════════════════════════════════════════════════════
+  //  ARC TESTNET CONFIG
+  //  USDC is the native gas token on Arc — sent via eth_sendTransaction
+  // ══════════════════════════════════════════════════════
+
+  const ARC_TESTNET_CHAIN_ID = '0x4CEE72'; // 5042002 in hex
+  const ARC_TESTNET_CONFIG = {
+    chainId: ARC_TESTNET_CHAIN_ID,
+    chainName: 'Arc Testnet',
+    rpcUrls: ['https://rpc.testnet.arc.network'],
+    nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 6 },
+    blockExplorerUrls: ['https://testnet.arcscan.app'],
+  };
+
+  // ── YOUR WALLET — USDC goes here ──
+  // Replace with YOUR MetaMask wallet address on Arc Testnet
+  const MERCHANT_WALLET = '0xYOUR_WALLET_ADDRESS_HERE';
+
+  // ── YOUR PAYMENT API on Railway ──
+  const API_URL = 'https://YOUR-RAILWAY-APP.up.railway.app';
+
+  let connectedAddress = '';
+
+  // ══════════════════════════════════════════════════════
+  //  CONNECT WALLET — Real MetaMask on Arc Testnet
+  // ══════════════════════════════════════════════════════
+
+  async function connectWallet() {
+    // Check if MetaMask is installed
+    if (!window.ethereum) {
+      alert(
+        'MetaMask is required to pay.\n\n' +
+        '1. Install MetaMask: metamask.io\n' +
+        '2. Add Arc Testnet (Chain ID: 5042002)\n' +
+        '3. Get free testnet USDC: faucet.circle.com'
+      );
+      return;
+    }
+
+    try {
+      // Request wallet connection
+      const accounts = await window.ethereum.request({
+        method: 'eth_requestAccounts'
+      });
+      connectedAddress = accounts[0];
+
+      // Switch to Arc Testnet (or add it if not present)
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: ARC_TESTNET_CHAIN_ID }],
+        });
+      } catch (switchErr) {
+        // Chain not added yet — add it automatically
+        if (switchErr.code === 4902) {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [ARC_TESTNET_CONFIG],
+          });
+        } else {
+          throw switchErr;
+        }
+      }
+
+      // Display address
+      const short = connectedAddress.slice(0,6) + '...' + connectedAddress.slice(-4);
+      document.getElementById('addrDisplay').textContent = short;
+
+      // Get USDC balance (USDC is native on Arc, so it's the native balance)
+      const bal = await window.ethereum.request({
+        method: 'eth_getBalance',
+        params: [connectedAddress, 'latest']
+      });
+      const usdcBalance = (parseInt(bal, 16) / 1e6).toFixed(2);
+      document.getElementById('balDisplay').textContent = usdcBalance + ' USDC';
+
+      // Move to Pay step
+      stepTo(2);
+      showState('statePay');
+
+    } catch (err) {
+      console.error('Connect failed:', err);
+      if (err.code === 4001) {
+        // User rejected the connection
+        alert('Connection cancelled. Please try again.');
+      } else {
+        alert('Failed to connect wallet. Make sure MetaMask is unlocked.');
+      }
+    }
+  }
+
+  // ══════════════════════════════════════════════════════
+  //  PROCESS PAYMENT — Real USDC transfer on Arc Testnet
+  // ══════════════════════════════════════════════════════
+
+  async function processPayment() {
+    showState('stateProcessing');
+    stepTo(3);
+
+    const params = new URLSearchParams(window.location.search);
+    const tgid = params.get('tgid') || '';
+    const tierMap = { pro: 1, elite: 2, institutional: 3 };
+    const tierNum = tierMap[selectedTier] || 1;
+
+    try {
+      // ── Step 1: Send real USDC on Arc Testnet ──
+      // USDC is native on Arc, so we send it like ETH on Ethereum
+      // Amount in hex (USDC has 6 decimals)
+      const amountInSmallestUnit = selectedPrice * 1e6; // e.g. 15 USDC = 15000000
+      const amountHex = '0x' + amountInSmallestUnit.toString(16);
+
+      const txHash = await window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [{
+          from: connectedAddress,
+          to: MERCHANT_WALLET,
+          value: amountHex,
+          // Gas is paid in USDC on Arc — MetaMask handles estimation
+        }],
+      });
+
+      // Transaction sent! On Arc this confirms in <1 second.
+      console.log('TX Hash:', txHash);
+
+      // ── Step 2: Tell the Payment API to activate the plan ──
+      const response = await fetch(API_URL + '/activate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: tgid,
+          tier: tierNum,
+          wallet_address: connectedAddress,
+          amount_usdc: selectedPrice,
+          tx_hash: txHash,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.ok) {
+        const tierNames = { pro:'Pro', elite:'Elite', institutional:'Institutional' };
+        document.getElementById('successTierName').textContent = tierNames[selectedTier];
+
+        // Update the ArcScan link with actual tx hash
+        const txLink = document.querySelector('.tx-link');
+        if (txLink) {
+          txLink.href = 'https://testnet.arcscan.app/tx/' + txHash;
+        }
+
+        showState('stateSuccess');
+        document.getElementById('s3').classList.add('done');
+      } else {
+        throw new Error(data.reason || 'Activation failed');
+      }
+
+    } catch (err) {
+      showState('statePay');
+      stepTo(2);
+      console.error('Payment failed:', err);
+
+      if (err.code === 4001) {
+        alert('Transaction cancelled.');
+      } else if (err.message && err.message.includes('insufficient')) {
+        alert(
+          'Not enough USDC!\n\n' +
+          'Get free testnet USDC:\n' +
+          'faucet.circle.com → select Arc Testnet'
+        );
+      } else {
+        alert('Payment failed. Please try again.');
+      }
+    }
+  }
+</script>
+
+</body>
+</html>
