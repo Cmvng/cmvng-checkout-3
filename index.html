@@ -1073,6 +1073,9 @@
   // ── YOUR PAYMENT API on Railway ──
   const API_URL = 'https://cmvng-payment-api-production.up.railway.app';
 
+  // ── YOUR COMPANION BOT on Railway ──
+  const COMPANION_BOT_URL = 'https://web-production-a372f5.up.railway.app';
+
   let connectedAddress = '';
 
   // ══════════════════════════════════════════════════════
@@ -1449,6 +1452,24 @@
         const txLink = document.querySelector('.tx-link');
         if (txLink) {
           txLink.href = 'https://testnet.arcscan.app/tx/' + txHash;
+        }
+
+        // Send Telegram confirmation to user
+        if (tgid) {
+          try {
+            await fetch(COMPANION_BOT_URL + '/notify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                user_id: tgid,
+                tier_name: tierNames[selectedTier],
+                amount: selectedPrice,
+                tx_hash: txHash,
+              }),
+            });
+          } catch (e) {
+            console.log('Telegram notify error:', e);
+          }
         }
 
         showState('stateSuccess');
