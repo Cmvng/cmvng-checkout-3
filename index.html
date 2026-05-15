@@ -746,6 +746,39 @@
     to { opacity:1; transform:translateY(0); }
   }
 
+  /* ── Plan CTA Buttons ── */
+  .plan-cta {
+    display: block;
+    text-align: center;
+    padding: 12px;
+    margin-top: 16px;
+    border-radius: var(--radius-sm);
+    background: var(--text);
+    color: var(--bg-card);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all var(--transition);
+  }
+  .plan-cta:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+  }
+  .plan-cta-outline {
+    background: transparent;
+    color: var(--text);
+    border: 1.5px solid var(--border);
+  }
+  .plan-cta-outline:hover {
+    background: var(--bg-hover);
+    opacity: 1;
+  }
+  .plan.selected .plan-cta { background: var(--green); color: white; }
+
+  /* Hide plan CTAs when in payment mode (tgid in URL) */
+  body.payment-mode .plan-cta { display: none; }
+
   /* ── Responsive ── */
   @media (max-width: 900px) {
     .plans { grid-template-columns: repeat(2, 1fr); }
@@ -801,6 +834,7 @@
         <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> Entry, SL & TP levels</li>
         <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> Pairs rotate weekly</li>
       </ul>
+      <a href="https://t.me/cmvng_signalvault_bot?start=free" class="plan-cta plan-cta-outline">Get Started Free →</a>
     </div>
 
     <!-- Pro -->
@@ -818,6 +852,7 @@
         <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> Entry, SL & TP levels</li>
         <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> Signal history & win-rate stats</li>
       </ul>
+      <a href="https://t.me/cmvng_signalvault_bot?start=pro" class="plan-cta">Get Pro →</a>
     </div>
 
     <!-- Elite -->
@@ -835,6 +870,7 @@
         <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> Multi-TP scaling targets</li>
         <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> VIP Telegram group</li>
       </ul>
+      <a href="https://t.me/cmvng_signalvault_bot?start=elite" class="plan-cta">Get Elite →</a>
     </div>
 
     <!-- Institutional -->
@@ -852,6 +888,7 @@
         <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> Portfolio risk allocation</li>
         <li><span class="feat-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span> 1-on-1 direct support</li>
       </ul>
+      <a href="https://t.me/cmvng_signalvault_bot?start=institutional" class="plan-cta">Get Institutional →</a>
     </div>
 
   </div>
@@ -1496,6 +1533,32 @@
       }
     }
   }
+
+  // ══════════════════════════════════════════════════════
+  //  INIT — Detect if user came from Telegram (has tgid)
+  // ══════════════════════════════════════════════════════
+
+  (function() {
+    const params = new URLSearchParams(window.location.search);
+    const tgid = params.get('tgid');
+    const tier = params.get('tier');
+    const price = params.get('price');
+
+    if (tgid) {
+      // User came from Telegram — show payment section, hide CTA buttons
+      document.body.classList.add('payment-mode');
+      document.getElementById('paymentArea').style.display = 'block';
+
+      // Auto-select the right plan if tier is in URL
+      if (tier) {
+        const planEl = document.querySelector('[data-tier="' + tier + '"]');
+        if (planEl) selectPlan(planEl);
+      }
+    } else {
+      // User visiting the site directly — hide payment section, show CTA buttons
+      document.getElementById('paymentArea').style.display = 'none';
+    }
+  })();
 </script>
 
 </body>
