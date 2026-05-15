@@ -1062,7 +1062,7 @@
     chainId: ARC_TESTNET_CHAIN_ID,
     chainName: 'Arc Testnet',
     rpcUrls: ['https://rpc.testnet.arc.network'],
-    nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 6 },
+    nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 },
     blockExplorerUrls: ['https://testnet.arcscan.app'],
   };
 
@@ -1310,24 +1310,50 @@
   async function addArcNetwork() {
     const provider = window._arcProvider || window.ethereum;
     try {
+      // Try with explicit params matching Arc docs exactly
       await provider.request({
         method: 'wallet_addEthereumChain',
-        params: [ARC_TESTNET_CONFIG],
+        params: [{
+          chainId: '0x4CEF52',
+          chainName: 'Arc Testnet',
+          rpcUrls: ['https://rpc.testnet.arc.network'],
+          nativeCurrency: {
+            name: 'USDC',
+            symbol: 'USDC',
+            decimals: 18
+          },
+          blockExplorerUrls: ['https://testnet.arcscan.app']
+        }],
       });
+
       // Try switching after adding
       try {
         await provider.request({
           method: 'wallet_switchEthereumChain',
-          params: [{ chainId: ARC_TESTNET_CHAIN_ID }],
+          params: [{ chainId: '0x4CEF52' }],
         });
       } catch(e) {}
-      // Check if we're on Arc now
+
       await checkNetworkStatus();
     } catch (err) {
+      console.error('Add network error:', err);
+
+      // Show the actual error to help debug
+      var errMsg = err.message || JSON.stringify(err);
+
       if (err.code === 4001) {
         alert('You rejected adding the network. Please approve it in your wallet to continue.');
       } else {
-        alert('Could not add Arc Testnet automatically.\n\nPlease add it manually in your wallet:\n\nNetwork: Arc Testnet\nRPC: https://rpc.testnet.arc.network\nChain ID: 5042002\nSymbol: USDC\nExplorer: https://testnet.arcscan.app');
+        alert(
+          'Auto-add failed: ' + errMsg + '\n\n' +
+          'Please add Arc Testnet manually in your wallet:\n\n' +
+          'Network: Arc Testnet\n' +
+          'RPC: https://rpc.testnet.arc.network\n' +
+          'Chain ID: 5042002\n' +
+          'Symbol: USDC\n' +
+          'Explorer: https://testnet.arcscan.app\n\n' +
+          'After adding, click "I\'ve already added it — continue"'
+        );
       }
     }
   }
