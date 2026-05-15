@@ -633,6 +633,113 @@
     gap: 6px;
   }
 
+  /* ── Wallet Modal ── */
+  .wallet-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .wallet-overlay.open { display: flex; }
+  .wallet-modal {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    width: 90%;
+    max-width: 380px;
+    animation: fadeIn 0.25s ease;
+  }
+  .wallet-modal-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .wallet-modal-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+  .wallet-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .wallet-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+  .wallet-option:hover {
+    border-color: #D0CDC9;
+    background: var(--bg-hover);
+  }
+  .wallet-option img, .wallet-option svg {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+  }
+  .wallet-option-info {
+    flex: 1;
+  }
+  .wallet-option-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .wallet-option-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+  .wallet-option-arrow {
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .wallet-option.detected::after {
+    content: 'Detected';
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--green);
+    background: var(--green-light);
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+  .wallet-modal-close {
+    width: 100%;
+    margin-top: 14px;
+    padding: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: var(--font);
+    font-size: 13px;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .wallet-modal-close:hover { color: var(--text); }
+  .wallet-modal-footer {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .wallet-modal-footer a {
+    color: var(--text-secondary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
   /* ── Animations ── */
   @keyframes fadeIn {
     from { opacity:0; transform:translateY(10px); }
@@ -858,6 +965,21 @@
 
 </div>
 
+<!-- Wallet Selection Modal -->
+<div class="wallet-overlay" id="walletModal">
+  <div class="wallet-modal">
+    <div class="wallet-modal-title">Connect Wallet</div>
+    <div class="wallet-modal-sub">Choose a wallet to pay with USDC on Arc Testnet</div>
+    <div class="wallet-list" id="walletList">
+      <!-- Populated by JavaScript -->
+    </div>
+    <button class="wallet-modal-close" onclick="closeWalletModal()">Cancel</button>
+    <div class="wallet-modal-footer">
+      Don't have a wallet? <a href="https://metamask.io" target="_blank">Get MetaMask</a>
+    </div>
+  </div>
+</div>
+
 <script>
   let selectedTier = 'pro';
   let selectedPrice = 15;
@@ -933,51 +1055,149 @@
   let connectedAddress = '';
 
   // ══════════════════════════════════════════════════════
-  //  CONNECT WALLET — Real MetaMask on Arc Testnet
+  //  WALLET DEFINITIONS
   // ══════════════════════════════════════════════════════
 
-  async function connectWallet() {
-    // Find available wallet providers
-    let provider = null;
+  const WALLETS = [
+    {
+      name: 'MetaMask',
+      icon: 'https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg',
+      desc: 'Popular browser extension wallet',
+      check: function(p) { return p && p.isMetaMask; },
+      deepLink: 'https://metamask.app.link/dapp/',
+    },
+    {
+      name: 'Rabby',
+      icon: 'https://rabby.io/assets/images/logo.svg',
+      desc: 'Multi-chain browser wallet',
+      check: function(p) { return p && p.isRabby; },
+    },
+    {
+      name: 'Coinbase Wallet',
+      icon: 'https://altcoinsbox.com/wp-content/uploads/2022/12/coinbase-logo-300x300.webp',
+      desc: 'Coinbase self-custody wallet',
+      check: function(p) { return p && (p.isCoinbaseWallet || p.isCoinbaseBrowser); },
+    },
+    {
+      name: 'Zerion',
+      icon: 'https://app.zerion.io/favicon-256.png',
+      desc: 'DeFi portfolio wallet',
+      check: function(p) { return p && p.isZerion; },
+    },
+    {
+      name: 'Brave Wallet',
+      icon: 'https://brave.com/static-assets/images/brave-logo-sans-text.svg',
+      desc: 'Built into Brave browser',
+      check: function(p) { return p && p.isBraveWallet; },
+    },
+    {
+      name: 'Trust Wallet',
+      icon: 'https://trustwallet.com/assets/images/media/assets/TWT.svg',
+      desc: 'Mobile crypto wallet',
+      check: function(p) { return p && p.isTrust; },
+    },
+  ];
 
-    // Check for multiple providers (EIP-5749)
-    if (window.ethereum && window.ethereum.providers && window.ethereum.providers.length > 0) {
-      // Multiple wallets installed — let user pick
-      const providers = window.ethereum.providers;
-      const names = providers.map(function(p, i) {
-        if (p.isMetaMask) return (i + 1) + '. MetaMask';
-        if (p.isCoinbaseWallet) return (i + 1) + '. Coinbase Wallet';
-        if (p.isRabby) return (i + 1) + '. Rabby';
-        if (p.isBraveWallet) return (i + 1) + '. Brave Wallet';
-        if (p.isZerion) return (i + 1) + '. Zerion';
-        return (i + 1) + '. Wallet ' + (i + 1);
-      });
-      const choice = prompt('Multiple wallets detected. Choose one:\n\n' + names.join('\n') + '\n\nEnter number:');
-      if (choice) {
-        const idx = parseInt(choice) - 1;
-        if (idx >= 0 && idx < providers.length) {
-          provider = providers[idx];
-        }
+  // ══════════════════════════════════════════════════════
+  //  WALLET MODAL
+  // ══════════════════════════════════════════════════════
+
+  function openWalletModal() {
+    const modal = document.getElementById('walletModal');
+    const list = document.getElementById('walletList');
+    list.innerHTML = '';
+
+    // Get all available providers
+    const allProviders = [];
+    if (window.ethereum) {
+      if (window.ethereum.providers && window.ethereum.providers.length > 0) {
+        window.ethereum.providers.forEach(function(p) { allProviders.push(p); });
+      } else {
+        allProviders.push(window.ethereum);
       }
-      if (!provider) return;
-    } else if (window.ethereum) {
-      // Single wallet
-      provider = window.ethereum;
-    } else {
-      alert(
-        'No wallet detected!\n\n' +
-        'Install one of these:\n' +
-        '• MetaMask (metamask.io)\n' +
-        '• Coinbase Wallet\n' +
-        '• Rabby Wallet\n' +
-        '• Rainbow\n\n' +
-        'Then refresh this page.'
-      );
-      return;
     }
 
+    // Build wallet options
+    const shown = new Set();
+    WALLETS.forEach(function(wallet) {
+      const matchedProvider = allProviders.find(wallet.check);
+      const detected = !!matchedProvider;
+
+      // Skip duplicate wallet names
+      if (shown.has(wallet.name)) return;
+      shown.add(wallet.name);
+
+      const btn = document.createElement('div');
+      btn.className = 'wallet-option' + (detected ? ' detected' : '');
+      btn.innerHTML =
+        '<img src="' + wallet.icon + '" alt="' + wallet.name + '" onerror="this.style.display=\'none\'">' +
+        '<div class="wallet-option-info">' +
+          '<div class="wallet-option-name">' + wallet.name + '</div>' +
+          '<div class="wallet-option-desc">' + (detected ? 'Ready to connect' : wallet.desc) + '</div>' +
+        '</div>' +
+        '<span class="wallet-option-arrow">›</span>';
+
+      btn.onclick = function() {
+        closeWalletModal();
+        if (detected) {
+          connectWithProvider(matchedProvider, wallet.name);
+        } else if (wallet.deepLink) {
+          // Open deep link for mobile or install page
+          window.open(wallet.deepLink + window.location.host + window.location.pathname + window.location.search, '_blank');
+        } else {
+          alert(wallet.name + ' is not installed.\n\nPlease install it and refresh this page.');
+        }
+      };
+
+      list.appendChild(btn);
+    });
+
+    // If no known wallets but ethereum exists, show generic option
+    if (allProviders.length > 0 && shown.size === 0) {
+      const btn = document.createElement('div');
+      btn.className = 'wallet-option detected';
+      btn.innerHTML =
+        '<svg viewBox="0 0 36 36" width="36" height="36"><rect width="36" height="36" rx="8" fill="#E8E6E3"/><text x="18" y="22" text-anchor="middle" font-size="16">🔗</text></svg>' +
+        '<div class="wallet-option-info">' +
+          '<div class="wallet-option-name">Browser Wallet</div>' +
+          '<div class="wallet-option-desc">Ready to connect</div>' +
+        '</div>' +
+        '<span class="wallet-option-arrow">›</span>';
+      btn.onclick = function() {
+        closeWalletModal();
+        connectWithProvider(allProviders[0], 'Browser Wallet');
+      };
+      list.appendChild(btn);
+    }
+
+    // If no wallets at all
+    if (allProviders.length === 0) {
+      list.innerHTML =
+        '<div style="text-align:center;padding:20px;color:var(--text-muted)">' +
+          '<p style="font-size:14px;margin-bottom:12px">No wallet detected</p>' +
+          '<p style="font-size:12px">Install MetaMask or another EVM wallet to continue.</p>' +
+        '</div>';
+    }
+
+    modal.classList.add('open');
+  }
+
+  function closeWalletModal() {
+    document.getElementById('walletModal').classList.remove('open');
+  }
+
+  // Close modal on overlay click
+  document.addEventListener('click', function(e) {
+    if (e.target.id === 'walletModal') closeWalletModal();
+  });
+
+  // ══════════════════════════════════════════════════════
+  //  CONNECT WITH SELECTED PROVIDER
+  // ══════════════════════════════════════════════════════
+
+  async function connectWithProvider(provider, walletName) {
     try {
-      // Step 1: Add Arc Testnet to the wallet
+      // Step 1: Add Arc Testnet
       try {
         await provider.request({
           method: 'wallet_addEthereumChain',
@@ -997,19 +1217,18 @@
         console.log('Switch chain:', e.message || e);
       }
 
-      // Step 3: Connect
+      // Step 3: Request accounts
       const accounts = await provider.request({
         method: 'eth_requestAccounts'
       });
       connectedAddress = accounts[0];
-
-      // Store provider for payment step
       window._arcProvider = provider;
 
       // Step 4: Display
       const short = connectedAddress.slice(0,6) + '...' + connectedAddress.slice(-4);
       document.getElementById('addrDisplay').textContent = short;
 
+      // Step 5: Get balance
       try {
         const bal = await provider.request({
           method: 'eth_getBalance',
@@ -1029,9 +1248,17 @@
       if (err.code === 4001) {
         alert('Connection cancelled.');
       } else {
-        alert('Connection failed: ' + (err.message || 'Unknown error') + '\n\nMake sure your wallet is unlocked and try again.');
+        alert('Failed to connect ' + walletName + '.\n\nMake sure the wallet is unlocked and try again.');
       }
     }
+  }
+
+  // ══════════════════════════════════════════════════════
+  //  CONNECT WALLET — Opens the wallet selection modal
+  // ══════════════════════════════════════════════════════
+
+  function connectWallet() {
+    openWalletModal();
   }
 
   // ══════════════════════════════════════════════════════
