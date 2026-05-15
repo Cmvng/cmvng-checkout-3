@@ -799,7 +799,8 @@
         </div>
         <button class="btn-primary" onclick="connectWallet()">Connect Wallet</button>
         <p class="pay-hint">
-          MetaMask or any EVM wallet.<br>
+          MetaMask, Coinbase, Rabby, Zerion, or any EVM wallet.<br>
+          Arc Testnet will be added automatically.<br>
           Need testnet USDC? <a href="https://faucet.circle.com" target="_blank">Get it free →</a>
         </p>
       </div>
@@ -936,65 +937,99 @@
   // ══════════════════════════════════════════════════════
 
   async function connectWallet() {
-    // Check if MetaMask is installed
-    if (!window.ethereum) {
+    // Find available wallet providers
+    let provider = null;
+
+    // Check for multiple providers (EIP-5749)
+    if (window.ethereum && window.ethereum.providers && window.ethereum.providers.length > 0) {
+      // Multiple wallets installed — let user pick
+      const providers = window.ethereum.providers;
+      const names = providers.map(function(p, i) {
+        if (p.isMetaMask) return (i + 1) + '. MetaMask';
+        if (p.isCoinbaseWallet) return (i + 1) + '. Coinbase Wallet';
+        if (p.isRabby) return (i + 1) + '. Rabby';
+        if (p.isBraveWallet) return (i + 1) + '. Brave Wallet';
+        if (p.isZerion) return (i + 1) + '. Zerion';
+        return (i + 1) + '. Wallet ' + (i + 1);
+      });
+      const choice = prompt('Multiple wallets detected. Choose one:\n\n' + names.join('\n') + '\n\nEnter number:');
+      if (choice) {
+        const idx = parseInt(choice) - 1;
+        if (idx >= 0 && idx < providers.length) {
+          provider = providers[idx];
+        }
+      }
+      if (!provider) return;
+    } else if (window.ethereum) {
+      // Single wallet
+      provider = window.ethereum;
+    } else {
       alert(
-        'MetaMask is required to pay.\n\n' +
-        '1. Install MetaMask: metamask.io\n' +
-        '2. Add Arc Testnet (Chain ID: 5042002)\n' +
-        '3. Get free testnet USDC: faucet.circle.com'
+        'No wallet detected!\n\n' +
+        'Install one of these:\n' +
+        '• MetaMask (metamask.io)\n' +
+        '• Coinbase Wallet\n' +
+        '• Rabby Wallet\n' +
+        '• Rainbow\n\n' +
+        'Then refresh this page.'
       );
       return;
     }
 
     try {
-      // Request wallet connection
-      const accounts = await window.ethereum.request({
+      // Step 1: Add Arc Testnet to the wallet
+      try {
+        await provider.request({
+          method: 'wallet_addEthereumChain',
+          params: [ARC_TESTNET_CONFIG],
+        });
+      } catch (e) {
+        console.log('Add chain:', e.message || e);
+      }
+
+      // Step 2: Switch to Arc Testnet
+      try {
+        await provider.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: ARC_TESTNET_CHAIN_ID }],
+        });
+      } catch (e) {
+        console.log('Switch chain:', e.message || e);
+      }
+
+      // Step 3: Connect
+      const accounts = await provider.request({
         method: 'eth_requestAccounts'
       });
       connectedAddress = accounts[0];
 
-      // Switch to Arc Testnet (or add it if not present)
-      try {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: ARC_TESTNET_CHAIN_ID }],
-        });
-      } catch (switchErr) {
-        // Chain not added yet — add it automatically
-        if (switchErr.code === 4902) {
-          await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [ARC_TESTNET_CONFIG],
-          });
-        } else {
-          throw switchErr;
-        }
-      }
+      // Store provider for payment step
+      window._arcProvider = provider;
 
-      // Display address
+      // Step 4: Display
       const short = connectedAddress.slice(0,6) + '...' + connectedAddress.slice(-4);
       document.getElementById('addrDisplay').textContent = short;
 
-      // Get USDC balance (USDC is native on Arc, so it's the native balance)
-      const bal = await window.ethereum.request({
-        method: 'eth_getBalance',
-        params: [connectedAddress, 'latest']
-      });
-      const usdcBalance = (parseInt(bal, 16) / 1e6).toFixed(2);
-      document.getElementById('balDisplay').textContent = usdcBalance + ' USDC';
+      try {
+        const bal = await provider.request({
+          method: 'eth_getBalance',
+          params: [connectedAddress, 'latest']
+        });
+        const usdcBalance = (parseInt(bal, 16) / 1e6).toFixed(2);
+        document.getElementById('balDisplay').textContent = usdcBalance + ' USDC';
+      } catch (e) {
+        document.getElementById('balDisplay').textContent = '— USDC';
+      }
 
-      // Move to Pay step
       stepTo(2);
       showState('statePay');
 
     } catch (err) {
       console.error('Connect failed:', err);
       if (err.code === 4001) {
-        // User rejected the connection
-        alert('Connection cancelled. Please try again.');
+        alert('Connection cancelled.');
       } else {
-        alert('Failed to connect wallet. Make sure MetaMask is unlocked.');
+        alert('Connection failed: ' + (err.message || 'Unknown error') + '\n\nMake sure your wallet is unlocked and try again.');
       }
     }
   }
@@ -1014,12 +1049,11 @@
 
     try {
       // ── Step 1: Send real USDC on Arc Testnet ──
-      // USDC is native on Arc, so we send it like ETH on Ethereum
-      // Amount in hex (USDC has 6 decimals)
+      const provider = window._arcProvider || window.ethereum;
       const amountInSmallestUnit = selectedPrice * 1e6; // e.g. 15 USDC = 15000000
       const amountHex = '0x' + amountInSmallestUnit.toString(16);
 
-      const txHash = await window.ethereum.request({
+      const txHash = await provider.request({
         method: 'eth_sendTransaction',
         params: [{
           from: connectedAddress,
