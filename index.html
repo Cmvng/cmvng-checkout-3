@@ -927,6 +927,27 @@
         <p class="pay-hint">Settles in &lt;1 second on Arc. No gas surprises — fees are in USDC.</p>
       </div>
 
+      <!-- State: Add Network (shown when Arc Testnet not added) -->
+      <div class="state" id="stateAddNetwork">
+        <div class="wallet-info">
+          <div class="wallet-left">
+            <span class="wallet-dot"></span>
+            <span class="wallet-addr" id="addrDisplayNetwork">0x1a2B...9f4E</span>
+          </div>
+          <span class="wallet-bal" style="color:var(--gold)">Wrong network</span>
+        </div>
+        <p style="font-size:13px;color:var(--text-secondary);text-align:center;margin-bottom:16px;">
+          Your wallet needs to be on <b>Arc Testnet</b> to pay with USDC.<br>
+          Click below to add it automatically.
+        </p>
+        <button class="btn-primary" onclick="addArcNetwork()" style="margin-bottom:8px;">
+          Add Arc Testnet to Wallet
+        </button>
+        <button class="btn-outline" onclick="checkNetworkStatus()" style="font-size:12px;">
+          I've already added it — continue
+        </button>
+      </div>
+
       <!-- State: Processing -->
       <div class="state" id="stateProcessing">
         <div class="processing-view">
@@ -1198,63 +1219,64 @@
 
   async function connectWithProvider(provider, walletName) {
     try {
-      // Step 1: Connect FIRST (some wallets like Zerion require this before adding chains)
+      // Step 1: Connect FIRST
       const accounts = await provider.request({
         method: 'eth_requestAccounts'
       });
       connectedAddress = accounts[0];
       window._arcProvider = provider;
 
-      // Step 2: Try to switch to Arc Testnet
-      let onArc = false;
-      try {
-        await provider.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: ARC_TESTNET_CHAIN_ID }],
-        });
-        onArc = true;
-      } catch (switchErr) {
-        // Chain not found — add it
-        console.log('Switch failed, adding chain:', switchErr.code, switchErr.message);
-        try {
-          await provider.request({
-            method: 'wallet_addEthereumChain',
-            params: [ARC_TESTNET_CONFIG],
-          });
-          onArc = true;
-        } catch (addErr) {
-          console.log('Add chain failed:', addErr.message);
-          // Some wallets auto-switch after adding, check current chain
-          try {
-            const chainId = await provider.request({ method: 'eth_chainId' });
-            if (chainId === ARC_TESTNET_CHAIN_ID) onArc = true;
-          } catch (e) {}
-        }
-      }
+      const short = connectedAddress.slice(0,6) + '...' + connectedAddress.slice(-4);
 
+      // Step 2: Check current chain
+      let currentChain = '';
+      try {
+        currentChain = await provider.request({ method: 'eth_chainId' });
+      } catch(e) {}
+
+      let onArc = (currentChain === ARC_TESTNET_CHAIN_ID);
+
+      // Step 3: If not on Arc, try to switch
       if (!onArc) {
-        // Last attempt — try adding then switching again
         try {
-          await provider.request({
-            method: 'wallet_addEthereumChain',
-            params: [ARC_TESTNET_CONFIG],
-          });
           await provider.request({
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: ARC_TESTNET_CHAIN_ID }],
           });
           onArc = true;
-        } catch (e) {
-          console.log('Final chain attempt:', e.message);
+        } catch (switchErr) {
+          // Chain doesn't exist — try to add it
+          if (switchErr.code === 4902 || switchErr.message.includes('Unrecognized') || switchErr.message.includes('not added')) {
+            try {
+              await provider.request({
+                method: 'wallet_addEthereumChain',
+                params: [ARC_TESTNET_CONFIG],
+              });
+              // Some wallets auto-switch after adding
+              try {
+                const newChain = await provider.request({ method: 'eth_chainId' });
+                onArc = (newChain === ARC_TESTNET_CHAIN_ID);
+              } catch(e) {}
+              if (!onArc) {
+                try {
+                  await provider.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: ARC_TESTNET_CHAIN_ID }],
+                  });
+                  onArc = true;
+                } catch(e) {}
+              }
+            } catch (addErr) {
+              console.log('Auto-add failed:', addErr.message);
+            }
+          }
         }
       }
 
-      // Step 3: Display address
-      const short = connectedAddress.slice(0,6) + '...' + connectedAddress.slice(-4);
-      document.getElementById('addrDisplay').textContent = short;
-
-      // Step 4: Get balance (only works if on Arc Testnet)
+      // Step 4: Show appropriate state
       if (onArc) {
+        // On Arc — show Pay state
+        document.getElementById('addrDisplay').textContent = short;
         try {
           const bal = await provider.request({
             method: 'eth_getBalance',
@@ -1265,12 +1287,14 @@
         } catch (e) {
           document.getElementById('balDisplay').textContent = '— USDC';
         }
+        stepTo(2);
+        showState('statePay');
       } else {
-        document.getElementById('balDisplay').textContent = 'Switch to Arc Testnet in your wallet';
+        // Not on Arc — show Add Network button
+        document.getElementById('addrDisplayNetwork').textContent = short;
+        stepTo(2);
+        showState('stateAddNetwork');
       }
-
-      stepTo(2);
-      showState('statePay');
 
     } catch (err) {
       console.error('Connect failed:', err);
@@ -1279,6 +1303,60 @@
       } else {
         alert('Failed to connect ' + walletName + '.\n\nMake sure the wallet is unlocked and try again.');
       }
+    }
+  }
+
+  // Called when user clicks "Add Arc Testnet to Wallet" button
+  async function addArcNetwork() {
+    const provider = window._arcProvider || window.ethereum;
+    try {
+      await provider.request({
+        method: 'wallet_addEthereumChain',
+        params: [ARC_TESTNET_CONFIG],
+      });
+      // Try switching after adding
+      try {
+        await provider.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: ARC_TESTNET_CHAIN_ID }],
+        });
+      } catch(e) {}
+      // Check if we're on Arc now
+      await checkNetworkStatus();
+    } catch (err) {
+      if (err.code === 4001) {
+        alert('You rejected adding the network. Please approve it in your wallet to continue.');
+      } else {
+        alert('Could not add Arc Testnet automatically.\n\nPlease add it manually in your wallet:\n\nNetwork: Arc Testnet\nRPC: https://rpc.testnet.arc.network\nChain ID: 5042002\nSymbol: USDC\nExplorer: https://testnet.arcscan.app');
+      }
+    }
+  }
+
+  // Called when user clicks "I've already added it — continue"
+  async function checkNetworkStatus() {
+    const provider = window._arcProvider || window.ethereum;
+    try {
+      const chainId = await provider.request({ method: 'eth_chainId' });
+      if (chainId === ARC_TESTNET_CHAIN_ID) {
+        // We're on Arc!
+        const short = connectedAddress.slice(0,6) + '...' + connectedAddress.slice(-4);
+        document.getElementById('addrDisplay').textContent = short;
+        try {
+          const bal = await provider.request({
+            method: 'eth_getBalance',
+            params: [connectedAddress, 'latest']
+          });
+          const usdcBalance = (parseInt(bal, 16) / 1e6).toFixed(2);
+          document.getElementById('balDisplay').textContent = usdcBalance + ' USDC';
+        } catch (e) {
+          document.getElementById('balDisplay').textContent = '— USDC';
+        }
+        showState('statePay');
+      } else {
+        alert('Still not on Arc Testnet.\n\nPlease switch to Arc Testnet in your wallet, then click "continue" again.');
+      }
+    } catch(e) {
+      alert('Could not check network. Please try again.');
     }
   }
 
