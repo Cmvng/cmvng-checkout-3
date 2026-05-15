@@ -1117,67 +1117,68 @@
       }
     }
 
-    // Build wallet options
-    const shown = new Set();
+    if (allProviders.length === 0) {
+      list.innerHTML =
+        '<div style="text-align:center;padding:24px;color:var(--text-muted)">' +
+          '<p style="font-size:15px;margin-bottom:8px;color:var(--text)">No wallet detected</p>' +
+          '<p style="font-size:13px;line-height:1.5">Install a wallet extension to continue:<br>' +
+          '<a href="https://metamask.io" target="_blank" style="color:var(--green)">MetaMask</a> · ' +
+          '<a href="https://rabby.io" target="_blank" style="color:var(--green)">Rabby</a> · ' +
+          '<a href="https://zerion.io" target="_blank" style="color:var(--green)">Zerion</a></p>' +
+        '</div>';
+      modal.classList.add('open');
+      return;
+    }
+
+    // Match providers to known wallets
+    const matched = [];
+    const usedProviders = new Set();
+
     WALLETS.forEach(function(wallet) {
-      const matchedProvider = allProviders.find(wallet.check);
-      const detected = !!matchedProvider;
+      for (let i = 0; i < allProviders.length; i++) {
+        if (!usedProviders.has(i) && wallet.check(allProviders[i])) {
+          matched.push({ wallet: wallet, provider: allProviders[i], index: i });
+          usedProviders.add(i);
+          break;
+        }
+      }
+    });
 
-      // Skip duplicate wallet names
-      if (shown.has(wallet.name)) return;
-      shown.add(wallet.name);
+    // Add any unmatched providers as "Browser Wallet"
+    allProviders.forEach(function(p, i) {
+      if (!usedProviders.has(i)) {
+        matched.push({
+          wallet: { name: 'Browser Wallet', icon: '', desc: 'Connected wallet' },
+          provider: p,
+          index: i
+        });
+      }
+    });
 
+    // Build buttons — only for detected wallets
+    matched.forEach(function(m) {
       const btn = document.createElement('div');
-      btn.className = 'wallet-option' + (detected ? ' detected' : '');
+      btn.className = 'wallet-option detected';
+
+      var iconHtml = m.wallet.icon
+        ? '<img src="' + m.wallet.icon + '" alt="' + m.wallet.name + '" onerror="this.style.display=\'none\'">'
+        : '<div style="width:36px;height:36px;background:var(--bg-muted);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px">🔗</div>';
+
       btn.innerHTML =
-        '<img src="' + wallet.icon + '" alt="' + wallet.name + '" onerror="this.style.display=\'none\'">' +
+        iconHtml +
         '<div class="wallet-option-info">' +
-          '<div class="wallet-option-name">' + wallet.name + '</div>' +
-          '<div class="wallet-option-desc">' + (detected ? 'Ready to connect' : wallet.desc) + '</div>' +
+          '<div class="wallet-option-name">' + m.wallet.name + '</div>' +
+          '<div class="wallet-option-desc">Ready to connect</div>' +
         '</div>' +
         '<span class="wallet-option-arrow">›</span>';
 
       btn.onclick = function() {
         closeWalletModal();
-        if (detected) {
-          connectWithProvider(matchedProvider, wallet.name);
-        } else if (wallet.deepLink) {
-          // Open deep link for mobile or install page
-          window.open(wallet.deepLink + window.location.host + window.location.pathname + window.location.search, '_blank');
-        } else {
-          alert(wallet.name + ' is not installed.\n\nPlease install it and refresh this page.');
-        }
+        connectWithProvider(m.provider, m.wallet.name);
       };
 
       list.appendChild(btn);
     });
-
-    // If no known wallets but ethereum exists, show generic option
-    if (allProviders.length > 0 && shown.size === 0) {
-      const btn = document.createElement('div');
-      btn.className = 'wallet-option detected';
-      btn.innerHTML =
-        '<svg viewBox="0 0 36 36" width="36" height="36"><rect width="36" height="36" rx="8" fill="#E8E6E3"/><text x="18" y="22" text-anchor="middle" font-size="16">🔗</text></svg>' +
-        '<div class="wallet-option-info">' +
-          '<div class="wallet-option-name">Browser Wallet</div>' +
-          '<div class="wallet-option-desc">Ready to connect</div>' +
-        '</div>' +
-        '<span class="wallet-option-arrow">›</span>';
-      btn.onclick = function() {
-        closeWalletModal();
-        connectWithProvider(allProviders[0], 'Browser Wallet');
-      };
-      list.appendChild(btn);
-    }
-
-    // If no wallets at all
-    if (allProviders.length === 0) {
-      list.innerHTML =
-        '<div style="text-align:center;padding:20px;color:var(--text-muted)">' +
-          '<p style="font-size:14px;margin-bottom:12px">No wallet detected</p>' +
-          '<p style="font-size:12px">Install MetaMask or another EVM wallet to continue.</p>' +
-        '</div>';
-    }
 
     modal.classList.add('open');
   }
@@ -1197,47 +1198,75 @@
 
   async function connectWithProvider(provider, walletName) {
     try {
-      // Step 1: Add Arc Testnet
-      try {
-        await provider.request({
-          method: 'wallet_addEthereumChain',
-          params: [ARC_TESTNET_CONFIG],
-        });
-      } catch (e) {
-        console.log('Add chain:', e.message || e);
-      }
-
-      // Step 2: Switch to Arc Testnet
-      try {
-        await provider.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: ARC_TESTNET_CHAIN_ID }],
-        });
-      } catch (e) {
-        console.log('Switch chain:', e.message || e);
-      }
-
-      // Step 3: Request accounts
+      // Step 1: Connect FIRST (some wallets like Zerion require this before adding chains)
       const accounts = await provider.request({
         method: 'eth_requestAccounts'
       });
       connectedAddress = accounts[0];
       window._arcProvider = provider;
 
-      // Step 4: Display
+      // Step 2: Try to switch to Arc Testnet
+      let onArc = false;
+      try {
+        await provider.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: ARC_TESTNET_CHAIN_ID }],
+        });
+        onArc = true;
+      } catch (switchErr) {
+        // Chain not found — add it
+        console.log('Switch failed, adding chain:', switchErr.code, switchErr.message);
+        try {
+          await provider.request({
+            method: 'wallet_addEthereumChain',
+            params: [ARC_TESTNET_CONFIG],
+          });
+          onArc = true;
+        } catch (addErr) {
+          console.log('Add chain failed:', addErr.message);
+          // Some wallets auto-switch after adding, check current chain
+          try {
+            const chainId = await provider.request({ method: 'eth_chainId' });
+            if (chainId === ARC_TESTNET_CHAIN_ID) onArc = true;
+          } catch (e) {}
+        }
+      }
+
+      if (!onArc) {
+        // Last attempt — try adding then switching again
+        try {
+          await provider.request({
+            method: 'wallet_addEthereumChain',
+            params: [ARC_TESTNET_CONFIG],
+          });
+          await provider.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: ARC_TESTNET_CHAIN_ID }],
+          });
+          onArc = true;
+        } catch (e) {
+          console.log('Final chain attempt:', e.message);
+        }
+      }
+
+      // Step 3: Display address
       const short = connectedAddress.slice(0,6) + '...' + connectedAddress.slice(-4);
       document.getElementById('addrDisplay').textContent = short;
 
-      // Step 5: Get balance
-      try {
-        const bal = await provider.request({
-          method: 'eth_getBalance',
-          params: [connectedAddress, 'latest']
-        });
-        const usdcBalance = (parseInt(bal, 16) / 1e6).toFixed(2);
-        document.getElementById('balDisplay').textContent = usdcBalance + ' USDC';
-      } catch (e) {
-        document.getElementById('balDisplay').textContent = '— USDC';
+      // Step 4: Get balance (only works if on Arc Testnet)
+      if (onArc) {
+        try {
+          const bal = await provider.request({
+            method: 'eth_getBalance',
+            params: [connectedAddress, 'latest']
+          });
+          const usdcBalance = (parseInt(bal, 16) / 1e6).toFixed(2);
+          document.getElementById('balDisplay').textContent = usdcBalance + ' USDC';
+        } catch (e) {
+          document.getElementById('balDisplay').textContent = '— USDC';
+        }
+      } else {
+        document.getElementById('balDisplay').textContent = 'Switch to Arc Testnet in your wallet';
       }
 
       stepTo(2);
