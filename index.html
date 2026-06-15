@@ -577,16 +577,18 @@ body.payment-mode .payment-section { display: block; }
           <!-- Hand-drawn TP zone (circled) -->
           <ellipse class="charcoal-circle" cx="437" cy="55" rx="32" ry="18" filter="url(#rough)"/>
           <!-- Handwritten "TP" label -->
-          <text class="sketch-text" x="470" y="44" fill="var(--green)" font-weight="700">TP!</text>
+          <text x="470" y="44" fill="var(--green)" font-family="'Caveat', cursive" font-size="22" font-weight="700">TP!</text>
           <!-- Arrow pointing to TP -->
           <path class="charcoal-arrow" d="M 305 58 Q 360 30, 410 50" filter="url(#rough)"/>
           <path class="charcoal-arrow" d="M 405 45 L 410 50 L 405 56" filter="url(#rough)"/>
 
-          <!-- Hand-drawn "BUY ZONE" label near reversal -->
-          <text class="sketch-text" x="135" y="245" fill="var(--green)" font-weight="700">BUY here</text>
-          <!-- Arrow down to buy zone -->
-          <path class="charcoal-arrow" d="M 168 232 L 168 225" filter="url(#rough)"/>
-          <path class="charcoal-arrow" d="M 163 228 L 168 222 L 173 228" filter="url(#rough)"/>
+          <!-- Hand-drawn "BUY" annotation near the reversal bottom (positioned inside viewBox) -->
+          <g filter="url(#rough2)">
+            <text x="145" y="232" fill="var(--green)" font-family="'Caveat', cursive" font-size="17" font-weight="700">BUY here</text>
+            <!-- Arrow from text up to the reversal candle -->
+            <path class="charcoal-arrow" d="M 165 218 L 165 210"/>
+            <path class="charcoal-arrow" d="M 160 213 L 165 207 L 170 213"/>
+          </g>
 
           <!-- Top-left signal info (clean, contrasts with hand-drawn) -->
           <g transform="translate(20, 14)">
@@ -628,103 +630,95 @@ body.payment-mode .payment-section { display: block; }
       <div class="product-visual">
         <svg viewBox="0 0 500 260" preserveAspectRatio="xMidYMid slice">
           <defs>
-            <filter id="rough3" x="0%" y="0%" width="100%" height="100%">
+            <filter id="rough3" x="-5%" y="-5%" width="110%" height="110%">
               <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="5"/>
-              <feDisplacementMap in="SourceGraphic" scale="0.6"/>
+              <feDisplacementMap in="SourceGraphic" scale="0.8"/>
             </filter>
           </defs>
 
-          <!-- "WINNING SLIP" handwritten arc top right (decorative) -->
-          <text x="345" y="32" class="pick-handwrite" fill="var(--brand-blue)" transform="rotate(-3 380 32)">WINNING SLIP</text>
-          <path class="pick-marker" d="M 340 38 Q 410 45, 475 30" filter="url(#rough3)" opacity="0.6"/>
-
-          <!-- ── PICK 1: Match card -->
-          <g transform="translate(20, 50)">
-            <!-- Shadow -->
-            <rect x="2" y="3" width="220" height="58" rx="8" class="pick-shadow"/>
-            <!-- Card -->
-            <rect width="220" height="58" rx="8" fill="var(--bg-card)" stroke="var(--border)" stroke-width="1"/>
-
-            <!-- League badge -->
-            <text x="12" y="14" class="pick-league">⚽ PREMIER LEAGUE · 15:00</text>
-
-            <!-- Teams -->
-            <text x="12" y="32" class="pick-team-name">Man City</text>
-            <text x="103" y="32" class="pick-vs">vs</text>
-            <text x="125" y="32" class="pick-team-name">Arsenal</text>
-
-            <!-- Pick + odds -->
-            <line x1="12" y1="40" x2="208" y2="40" class="pick-divider"/>
-            <text x="12" y="53" fill="var(--text-secondary)" font-family="var(--font)" font-size="11" font-weight="500">Over 2.5 goals</text>
-            <text x="208" y="53" text-anchor="end" class="pick-odds">1.85</text>
-
-            <!-- Handwritten check mark (winning) -->
-            <g filter="url(#rough3)">
-              <path class="pick-check" d="M 232 28 L 244 40 L 268 18"/>
-            </g>
-          </g>
-
-          <!-- ── PICK 2: Match card -->
-          <g transform="translate(260, 78)">
-            <rect x="2" y="3" width="220" height="58" rx="8" class="pick-shadow"/>
-            <rect width="220" height="58" rx="8" fill="var(--bg-card)" stroke="var(--border)" stroke-width="1"/>
-
-            <text x="12" y="14" class="pick-league">⚽ LA LIGA · 17:30</text>
-
-            <text x="12" y="32" class="pick-team-name">Real Madrid</text>
-            <text x="116" y="32" class="pick-vs">vs</text>
-            <text x="138" y="32" class="pick-team-name">Sevilla</text>
-
-            <line x1="12" y1="40" x2="208" y2="40" class="pick-divider"/>
-            <text x="12" y="53" fill="var(--text-secondary)" font-family="var(--font)" font-size="11" font-weight="500">Madrid Win &amp; BTTS</text>
-            <text x="208" y="53" text-anchor="end" class="pick-odds">1.95</text>
-          </g>
-
-          <!-- ── PICK 3: Match card (partially behind for stacking depth) -->
-          <g transform="translate(40, 130)">
-            <rect x="2" y="3" width="220" height="58" rx="8" class="pick-shadow"/>
-            <rect width="220" height="58" rx="8" fill="var(--bg-card)" stroke="var(--border)" stroke-width="1"/>
-
-            <text x="12" y="14" class="pick-league">🏀 NBA · 02:00 GMT</text>
-
-            <text x="12" y="32" class="pick-team-name">Lakers</text>
-            <text x="80" y="32" class="pick-vs">vs</text>
-            <text x="102" y="32" class="pick-team-name">Warriors</text>
-
-            <line x1="12" y1="40" x2="208" y2="40" class="pick-divider"/>
-            <text x="12" y="53" fill="var(--text-secondary)" font-family="var(--font)" font-size="11" font-weight="500">LAL +4.5</text>
-            <text x="208" y="53" text-anchor="end" class="pick-odds">1.91</text>
-
-            <!-- Check on this one too -->
-            <g filter="url(#rough3)">
-              <path class="pick-check" d="M 270 28 L 282 40 L 306 18"/>
-            </g>
-          </g>
-
-          <!-- Combined odds badge — circled with hand-drawn marker -->
-          <g transform="translate(310, 168)">
-            <!-- Hand-drawn circle around the odds -->
-            <ellipse cx="60" cy="38" rx="78" ry="32" class="pick-marker" filter="url(#rough3)"/>
-            <ellipse cx="60" cy="38" rx="72" ry="28" class="pick-marker" filter="url(#rough3)" opacity="0.4"/>
-
-            <!-- The big number -->
-            <text x="60" y="32" text-anchor="middle" fill="var(--brand-blue)" font-family="var(--font-mono)" font-size="11" font-weight="700" letter-spacing="0.08em">COMBINED</text>
-            <text x="60" y="58" text-anchor="middle" fill="var(--brand-blue)" font-family="var(--font-mono)" font-size="28" font-weight="700" letter-spacing="-0.03em">5.12</text>
-          </g>
-
-          <!-- Tier label top-left -->
-          <g transform="translate(20, 14)">
-            <rect width="90" height="26" rx="13" fill="var(--brand-blue)"/>
-            <text x="45" y="18" text-anchor="middle" fill="white" font-family="var(--font-mono)" font-size="10" font-weight="700" letter-spacing="0.08em">5 ODDS</text>
-            <text x="45" y="32" text-anchor="middle" fill="white" font-family="var(--font-mono)" font-size="8" font-weight="600" letter-spacing="0.06em" opacity="0.85">AM SLIP</text>
+          <!-- Tier badge top-left -->
+          <g transform="translate(20, 16)">
+            <rect width="80" height="26" rx="13" fill="var(--brand-blue)"/>
+            <text x="40" y="18" text-anchor="middle" fill="white" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" letter-spacing="0.08em">5 ODDS</text>
+            <text x="40" y="33" text-anchor="middle" fill="white" font-family="'JetBrains Mono', monospace" font-size="8" font-weight="600" letter-spacing="0.06em" opacity="0.9">AM SLIP</text>
           </g>
 
           <!-- Live indicator -->
-          <g transform="translate(120, 14)">
+          <g transform="translate(112, 16)">
             <circle cx="6" cy="14" r="4" fill="var(--green)">
               <animate attributeName="opacity" values="1;0.3;1" dur="1.8s" repeatCount="indefinite"/>
             </circle>
-            <text x="16" y="18" fill="var(--green)" font-family="var(--font-mono)" font-size="10" font-weight="700" letter-spacing="0.08em">LIVE NOW</text>
+            <text x="16" y="18" fill="var(--green)" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" letter-spacing="0.08em">LIVE</text>
+          </g>
+
+          <!-- Handwritten "Today's slip 🔥" top-right -->
+          <text x="478" y="36" text-anchor="end" fill="var(--brand-blue)" font-family="'Caveat', cursive" font-size="22" font-weight="700">Today's slip</text>
+
+          <!-- ── PICK 1: Man City vs Arsenal ── -->
+          <g transform="translate(20, 60)">
+            <!-- Drop shadow -->
+            <rect x="2" y="3" width="240" height="62" rx="10" fill="var(--text)" opacity="0.06"/>
+            <!-- Card -->
+            <rect width="240" height="62" rx="10" fill="var(--bg-card)" stroke="var(--border)" stroke-width="1"/>
+
+            <!-- League row -->
+            <circle cx="14" cy="14" r="3.5" fill="var(--brand-blue)"/>
+            <text x="22" y="17" fill="var(--text-muted)" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="600" letter-spacing="0.08em">PREMIER LEAGUE</text>
+            <text x="226" y="17" text-anchor="end" fill="var(--text-muted)" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="500">15:00 GMT</text>
+
+            <!-- Teams -->
+            <text x="14" y="38" fill="var(--text)" font-family="Inter, sans-serif" font-size="14" font-weight="700" letter-spacing="-0.01em">Man City</text>
+            <text x="100" y="38" fill="var(--text-muted)" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="500">vs</text>
+            <text x="122" y="38" fill="var(--text)" font-family="Inter, sans-serif" font-size="14" font-weight="700" letter-spacing="-0.01em">Arsenal</text>
+
+            <!-- Dashed divider -->
+            <line x1="14" y1="45" x2="226" y2="45" stroke="var(--border)" stroke-dasharray="3 3"/>
+
+            <!-- Pick + odds -->
+            <text x="14" y="57" fill="var(--text-secondary)" font-family="Inter, sans-serif" font-size="11.5" font-weight="500">Over 2.5 goals</text>
+            <text x="226" y="58" text-anchor="end" fill="var(--brand-blue)" font-family="'JetBrains Mono', monospace" font-size="15" font-weight="700">1.85</text>
+
+            <!-- Win check mark — sits ON the card top-right corner -->
+            <g transform="translate(220, -8)" filter="url(#rough3)">
+              <circle cx="10" cy="10" r="11" fill="var(--green)"/>
+              <path d="M 5 10 L 8.5 13.5 L 15 7" stroke="white" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+          </g>
+
+          <!-- ── PICK 2: Real Madrid vs Sevilla ── -->
+          <g transform="translate(240, 134)">
+            <rect x="2" y="3" width="240" height="62" rx="10" fill="var(--text)" opacity="0.06"/>
+            <rect width="240" height="62" rx="10" fill="var(--bg-card)" stroke="var(--border)" stroke-width="1"/>
+
+            <circle cx="14" cy="14" r="3.5" fill="var(--brand-blue)"/>
+            <text x="22" y="17" fill="var(--text-muted)" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="600" letter-spacing="0.08em">LA LIGA</text>
+            <text x="226" y="17" text-anchor="end" fill="var(--text-muted)" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="500">17:30 GMT</text>
+
+            <text x="14" y="38" fill="var(--text)" font-family="Inter, sans-serif" font-size="14" font-weight="700" letter-spacing="-0.01em">Real Madrid</text>
+            <text x="124" y="38" fill="var(--text-muted)" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="500">vs</text>
+            <text x="146" y="38" fill="var(--text)" font-family="Inter, sans-serif" font-size="14" font-weight="700" letter-spacing="-0.01em">Sevilla</text>
+
+            <line x1="14" y1="45" x2="226" y2="45" stroke="var(--border)" stroke-dasharray="3 3"/>
+
+            <text x="14" y="57" fill="var(--text-secondary)" font-family="Inter, sans-serif" font-size="11.5" font-weight="500">Madrid + BTTS</text>
+            <text x="226" y="58" text-anchor="end" fill="var(--brand-blue)" font-family="'JetBrains Mono', monospace" font-size="15" font-weight="700">1.95</text>
+
+            <!-- Win check -->
+            <g transform="translate(220, -8)" filter="url(#rough3)">
+              <circle cx="10" cy="10" r="11" fill="var(--green)"/>
+              <path d="M 5 10 L 8.5 13.5 L 15 7" stroke="white" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+          </g>
+
+          <!-- ── Combined odds — bold floating badge bottom-left ── -->
+          <g transform="translate(20, 200)">
+            <!-- Outer hand-drawn marker ring -->
+            <rect x="-4" y="-4" width="178" height="48" rx="10" fill="none" stroke="var(--brand-blue)" stroke-width="2" stroke-dasharray="0" filter="url(#rough3)" opacity="0.4"/>
+            <!-- Inner solid -->
+            <rect width="170" height="40" rx="8" fill="var(--brand-blue)"/>
+            <text x="14" y="16" fill="white" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="700" letter-spacing="0.12em" opacity="0.85">COMBINED · 3 LEGS</text>
+            <text x="14" y="34" fill="white" font-family="'JetBrains Mono', monospace" font-size="20" font-weight="700" letter-spacing="-0.02em">5.12</text>
+            <text x="156" y="34" text-anchor="end" fill="white" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="500" opacity="0.8">odds</text>
           </g>
         </svg>
       </div>
