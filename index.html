@@ -7,7 +7,7 @@
 <meta name="description" content="Forex & crypto signals plus daily sports codes. Pay with USDC on Arc.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Caveat:wght@500;600;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
 <style>
 /* ═══ Design System ═══ */
 :root {
@@ -139,13 +139,129 @@ button { font-family: inherit; }
 
 /* Products */
 .products { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.product { display: flex; flex-direction: column; padding: 32px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); text-decoration: none; color: inherit; position: relative; overflow: hidden; transition: all var(--transition); cursor: pointer; }
-.product:hover { border-color: var(--border-hover); transform: translateY(-2px); }
-.product-bg { position: absolute; top: -100px; right: -100px; width: 320px; height: 320px; border-radius: 50%; filter: blur(60px); opacity: 0.3; z-index: 0; }
-.product.signals .product-bg { background: var(--green); }
-.product.sports .product-bg { background: var(--brand-blue); }
-.product > * { position: relative; z-index: 1; }
-.product-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+.product {
+  display: flex; flex-direction: column;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  text-decoration: none; color: inherit;
+  position: relative; overflow: hidden;
+  transition: all var(--transition);
+  cursor: pointer;
+}
+.product:hover { border-color: var(--border-hover); transform: translateY(-2px); box-shadow: 0 12px 32px rgba(0,0,0,0.25); }
+[data-theme="light"] .product:hover { box-shadow: 0 12px 32px rgba(0,0,0,0.06); }
+
+/* The visual is the hero — fills the top of the card */
+.product-visual {
+  position: relative;
+  width: 100%;
+  height: 260px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+.product-visual svg { width: 100%; height: 100%; display: block; }
+.product.signals .product-visual {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 100%, var(--green-glow), transparent 70%),
+    var(--bg-elevated);
+}
+.product.sports .product-visual {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 100%, var(--blue-glow), transparent 70%),
+    var(--bg-elevated);
+}
+
+/* Card body */
+.product-body { padding: 28px 30px 30px; display: flex; flex-direction: column; flex: 1; }
+.product-eyebrow-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 10px;
+}
+.product-icon-sm {
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+}
+.product.signals .product-icon-sm { color: var(--green); }
+.product.sports .product-icon-sm { color: var(--brand-blue); }
+.product-icon-sm svg { width: 18px; height: 18px; }
+
+.product-eyebrow {
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.1em;
+}
+.product.signals .product-eyebrow { color: var(--green); }
+.product.sports .product-eyebrow { color: var(--brand-blue); }
+
+.product h3 {
+  font-size: 26px; font-weight: 600;
+  letter-spacing: -0.02em; line-height: 1.15;
+  margin-bottom: 12px;
+}
+.product p {
+  font-size: 14.5px; color: var(--text-secondary);
+  line-height: 1.55; margin-bottom: 22px;
+}
+
+.product-features {
+  list-style: none; display: flex; flex-direction: column;
+  gap: 9px; margin-bottom: 24px; flex: 1;
+}
+.product-features li {
+  font-size: 13px; color: var(--text-secondary);
+  display: flex; align-items: center; gap: 10px;
+}
+.feat-check {
+  width: 16px; height: 16px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.product.signals .feat-check { background: var(--green-dim); color: var(--green); }
+.product.sports .feat-check { background: var(--blue-dim); color: var(--brand-blue); }
+.feat-check svg { width: 10px; height: 10px; }
+
+.product-cta {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 20px; border-top: 1px solid var(--border);
+}
+.product-price { font-size: 13px; color: var(--text-muted); }
+.product-price strong { color: var(--text); font-weight: 600; }
+.product-arrow {
+  font-size: 13px; font-weight: 500;
+  display: flex; align-items: center; gap: 6px;
+  transition: gap var(--transition);
+}
+.product.signals .product-arrow { color: var(--green); }
+.product.sports .product-arrow { color: var(--brand-blue); }
+.product:hover .product-arrow { gap: 10px; }
+
+/* ── Hand-drawn candlestick (charcoal style) ── */
+.sketch-bg { fill: var(--bg-elevated); }
+.sketch-stroke { stroke: var(--text); stroke-width: 1; fill: none; opacity: 0.55; stroke-linecap: round; stroke-linejoin: round; }
+.sketch-stroke-light { stroke: var(--text-muted); stroke-width: 0.7; fill: none; opacity: 0.35; stroke-linecap: round; stroke-dasharray: 2 3; }
+.sketch-text { fill: var(--text); font-family: 'Caveat', 'Kalam', cursive; font-size: 16px; font-weight: 600; }
+.sketch-text-sm { fill: var(--text-secondary); font-family: 'Caveat', cursive; font-size: 13px; }
+.sketch-label-mono { fill: var(--text-muted); font-family: var(--font-mono); font-size: 9px; font-weight: 600; letter-spacing: 0.08em; }
+.charcoal-up { stroke: var(--green); stroke-width: 2.2; fill: var(--green); fill-opacity: 0.85; stroke-linecap: round; stroke-linejoin: round; }
+.charcoal-up-wick { stroke: var(--green); stroke-width: 1.6; stroke-linecap: round; opacity: 0.75; }
+.charcoal-down { stroke: var(--red); stroke-width: 2.2; fill: var(--red); fill-opacity: 0.85; stroke-linecap: round; stroke-linejoin: round; }
+.charcoal-down-wick { stroke: var(--red); stroke-width: 1.6; stroke-linecap: round; opacity: 0.75; }
+.charcoal-arrow { stroke: var(--green); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.charcoal-circle { stroke: var(--green); stroke-width: 1.8; fill: none; stroke-linecap: round; opacity: 0.8; }
+
+/* ── Sports picks card ── */
+.pick-card-bg { fill: var(--bg-card); stroke: var(--text); stroke-width: 1; opacity: 1; }
+.pick-shadow { fill: var(--text); opacity: 0.08; }
+.pick-divider { stroke: var(--border); stroke-width: 1; stroke-dasharray: 3 3; }
+.pick-team-name { fill: var(--text); font-family: var(--font); font-weight: 700; font-size: 13px; letter-spacing: -0.01em; }
+.pick-league { fill: var(--text-muted); font-family: var(--font-mono); font-size: 8.5px; font-weight: 600; letter-spacing: 0.08em; }
+.pick-vs { fill: var(--text-muted); font-family: var(--font-mono); font-size: 11px; font-weight: 600; }
+.pick-odds { fill: var(--brand-blue); font-family: var(--font-mono); font-size: 14px; font-weight: 700; }
+.pick-time { fill: var(--text-muted); font-family: var(--font-mono); font-size: 9px; font-weight: 500; }
+.pick-check { stroke: var(--green); stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.pick-marker { stroke: var(--brand-blue); stroke-width: 2; fill: none; stroke-linecap: round; }
+.pick-handwrite { fill: var(--brand-blue); font-family: 'Caveat', 'Kalam', cursive; font-size: 18px; font-weight: 700; }
+
 .product.signals .product-icon { background: var(--green-dim); color: var(--green); }
 .product.sports .product-icon { background: var(--blue-dim); color: var(--brand-blue); }
 .product-icon svg { width: 22px; height: 22px; }
@@ -366,35 +482,272 @@ body.payment-mode .payment-section { display: block; }
   </div>
   <div class="products">
     <a href="#pricing" onclick="setTab('signals')" class="product signals">
-      <div class="product-bg"></div>
-      <div class="product-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></div>
-      <div class="product-eyebrow">cmvng Signals</div>
-      <h3>Forex &amp; crypto<br>trading signals</h3>
-      <p>Limit-order signals with precise entry, SL, and TP across 25+ pairs. Auto-monitored 24/7.</p>
-      <ul class="product-features">
-        <li><span class="feat-check"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></span> 25+ profitable pairs</li>
-        <li><span class="feat-check"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></span> T1 + T2 signal tiers</li>
-        <li><span class="feat-check"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></span> Real-time Telegram delivery</li>
-      </ul>
-      <div class="product-cta">
-        <span class="product-price"><strong>Free</strong> to <strong>150 USDC</strong>/mo</span>
-        <span class="product-arrow">Explore <span>→</span></span>
+      <!-- Hand-drawn candlestick chart -->
+      <div class="product-visual">
+        <svg viewBox="0 0 500 260" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <!-- Paper texture (subtle grain) -->
+            <filter id="rough" x="0%" y="0%" width="100%" height="100%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3"/>
+              <feDisplacementMap in="SourceGraphic" scale="0.6"/>
+            </filter>
+            <filter id="rough2" x="0%" y="0%" width="100%" height="100%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="7"/>
+              <feDisplacementMap in="SourceGraphic" scale="0.8"/>
+            </filter>
+          </defs>
+
+          <!-- Loose horizontal pencil-marked guide lines -->
+          <g class="sketch-stroke-light" filter="url(#rough)">
+            <path d="M 25 70 L 478 71"/>
+            <path d="M 25 130 L 478 129"/>
+            <path d="M 25 190 L 477 191"/>
+          </g>
+
+          <!-- Y-axis pencil scribble -->
+          <path class="sketch-stroke" d="M 22 35 L 23 232" filter="url(#rough)"/>
+          <!-- X-axis pencil scribble -->
+          <path class="sketch-stroke" d="M 22 232 L 478 233" filter="url(#rough)"/>
+
+          <!-- Price axis labels (handwritten) -->
+          <text class="sketch-text-sm" x="6" y="74">2380</text>
+          <text class="sketch-text-sm" x="6" y="134">2340</text>
+          <text class="sketch-text-sm" x="6" y="194">2300</text>
+
+          <!-- CHARCOAL CANDLES — realistic volatility, up AND down movement -->
+          <!-- Wave 1: opening volatility, mostly red -->
+          <g filter="url(#rough2)">
+            <line class="charcoal-down-wick" x1="44" y1="100" x2="44" y2="155"/>
+            <rect class="charcoal-down" x="38" y="115" width="12" height="32" rx="1"/>
+
+            <line class="charcoal-down-wick" x1="68" y1="110" x2="68" y2="175"/>
+            <rect class="charcoal-down" x="62" y="125" width="12" height="40" rx="1"/>
+
+            <line class="charcoal-up-wick" x1="92" y1="130" x2="92" y2="180"/>
+            <rect class="charcoal-up" x="86" y="142" width="12" height="30" rx="1"/>
+
+            <line class="charcoal-down-wick" x1="116" y1="140" x2="116" y2="195"/>
+            <rect class="charcoal-down" x="110" y="152" width="12" height="35" rx="1"/>
+
+            <line class="charcoal-down-wick" x1="140" y1="160" x2="140" y2="215"/>
+            <rect class="charcoal-down" x="134" y="170" width="12" height="38" rx="1"/>
+
+            <!-- Bottom — reversal zone -->
+            <line class="charcoal-up-wick" x1="164" y1="180" x2="164" y2="220"/>
+            <rect class="charcoal-up" x="158" y="190" width="12" height="22" rx="1"/>
+
+            <line class="charcoal-up-wick" x1="188" y1="155" x2="188" y2="200"/>
+            <rect class="charcoal-up" x="182" y="165" width="12" height="30" rx="1"/>
+
+            <!-- Wave 2: recovery up -->
+            <line class="charcoal-up-wick" x1="212" y1="135" x2="212" y2="180"/>
+            <rect class="charcoal-up" x="206" y="148" width="12" height="28" rx="1"/>
+
+            <line class="charcoal-down-wick" x1="236" y1="140" x2="236" y2="175"/>
+            <rect class="charcoal-down" x="230" y="148" width="12" height="22" rx="1"/>
+
+            <line class="charcoal-up-wick" x1="260" y1="115" x2="260" y2="165"/>
+            <rect class="charcoal-up" x="254" y="128" width="12" height="32" rx="1"/>
+
+            <line class="charcoal-up-wick" x1="284" y1="98" x2="284" y2="148"/>
+            <rect class="charcoal-up" x="278" y="108" width="12" height="32" rx="1"/>
+
+            <line class="charcoal-down-wick" x1="308" y1="105" x2="308" y2="138"/>
+            <rect class="charcoal-down" x="302" y="112" width="12" height="22" rx="1"/>
+
+            <line class="charcoal-up-wick" x1="332" y1="80" x2="332" y2="130"/>
+            <rect class="charcoal-up" x="326" y="92" width="12" height="32" rx="1"/>
+
+            <line class="charcoal-up-wick" x1="356" y1="62" x2="356" y2="115"/>
+            <rect class="charcoal-up" x="350" y="74" width="12" height="34" rx="1"/>
+
+            <line class="charcoal-down-wick" x1="380" y1="70" x2="380" y2="105"/>
+            <rect class="charcoal-down" x="374" y="78" width="12" height="22" rx="1"/>
+
+            <line class="charcoal-up-wick" x1="404" y1="48" x2="404" y2="98"/>
+            <rect class="charcoal-up" x="398" y="58" width="12" height="32" rx="1"/>
+
+            <line class="charcoal-up-wick" x1="428" y1="35" x2="428" y2="85"/>
+            <rect class="charcoal-up" x="422" y="48" width="12" height="32" rx="1"/>
+
+            <line class="charcoal-up-wick" x1="452" y1="50" x2="452" y2="75"/>
+            <rect class="charcoal-up" x="446" y="55" width="12" height="20" rx="1"/>
+          </g>
+
+          <!-- Hand-drawn TP zone (circled) -->
+          <ellipse class="charcoal-circle" cx="437" cy="55" rx="32" ry="18" filter="url(#rough)"/>
+          <!-- Handwritten "TP" label -->
+          <text class="sketch-text" x="470" y="44" fill="var(--green)" font-weight="700">TP!</text>
+          <!-- Arrow pointing to TP -->
+          <path class="charcoal-arrow" d="M 305 58 Q 360 30, 410 50" filter="url(#rough)"/>
+          <path class="charcoal-arrow" d="M 405 45 L 410 50 L 405 56" filter="url(#rough)"/>
+
+          <!-- Hand-drawn "BUY ZONE" label near reversal -->
+          <text class="sketch-text" x="135" y="245" fill="var(--green)" font-weight="700">BUY here</text>
+          <!-- Arrow down to buy zone -->
+          <path class="charcoal-arrow" d="M 168 232 L 168 225" filter="url(#rough)"/>
+          <path class="charcoal-arrow" d="M 163 228 L 168 222 L 173 228" filter="url(#rough)"/>
+
+          <!-- Top-left signal info (clean, contrasts with hand-drawn) -->
+          <g transform="translate(20, 14)">
+            <rect width="135" height="44" rx="6" fill="var(--bg-card)" stroke="var(--border)" stroke-width="1"/>
+            <circle cx="14" cy="15" r="4" fill="var(--green)">
+              <animate attributeName="opacity" values="1;0.3;1" dur="1.8s" repeatCount="indefinite"/>
+            </circle>
+            <text x="24" y="19" fill="var(--text)" font-family="var(--font)" font-size="12" font-weight="700">XAUUSD</text>
+            <text x="24" y="34" fill="var(--green)" font-family="var(--font-mono)" font-size="9" font-weight="700" letter-spacing="0.05em">BUY · 30M · T1</text>
+            <text x="125" y="19" text-anchor="end" fill="var(--green)" font-family="var(--font-mono)" font-size="11" font-weight="700">+1.24%</text>
+            <text x="125" y="33" text-anchor="end" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="8">RR 1:2.15</text>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Body -->
+      <div class="product-body">
+        <div class="product-eyebrow-row">
+          <span class="product-icon-sm">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>
+          </span>
+          <span class="product-eyebrow">cmvng Signals</span>
+        </div>
+        <h3>Forex &amp; crypto<br>trading signals</h3>
+        <p>Limit-order signals with precise entry, SL, and TP across 25+ pairs. Auto-monitored 24/7.</p>
+        <ul class="product-features">
+          <li><span class="feat-check"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></span> 25+ profitable pairs</li>
+          <li><span class="feat-check"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></span> T1 + T2 signal tiers</li>
+          <li><span class="feat-check"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></span> Real-time Telegram delivery</li>
+        </ul>
+        <div class="product-cta">
+          <span class="product-price"><strong>Free</strong> to <strong>150 USDC</strong>/mo</span>
+          <span class="product-arrow">Explore <span>→</span></span>
+        </div>
       </div>
     </a>
     <a href="#pricing" onclick="setTab('sports')" class="product sports">
-      <div class="product-bg"></div>
-      <div class="product-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 010 20M12 2a14.5 14.5 0 000 20M2 12h20"/></svg></div>
-      <div class="product-eyebrow">cmvng Sports</div>
-      <h3>Daily sports<br>betting codes</h3>
-      <p>Curated daily codes from verified analysts. AM &amp; PM drops. Pick your risk tier.</p>
-      <ul class="product-features">
-        <li><span class="feat-check"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></span> 2 / 3 / 5 / 10 / 100 odds tiers</li>
-        <li><span class="feat-check"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></span> AM + PM daily drops</li>
-        <li><span class="feat-check"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></span> Grand Audit weekly pack</li>
-      </ul>
-      <div class="product-cta">
-        <span class="product-price"><strong>Free</strong> to <strong>150 USDC</strong>/mo</span>
-        <span class="product-arrow">Explore <span>→</span></span>
+      <!-- Sports picks scorecard -->
+      <div class="product-visual">
+        <svg viewBox="0 0 500 260" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <filter id="rough3" x="0%" y="0%" width="100%" height="100%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="5"/>
+              <feDisplacementMap in="SourceGraphic" scale="0.6"/>
+            </filter>
+          </defs>
+
+          <!-- "WINNING SLIP" handwritten arc top right (decorative) -->
+          <text x="345" y="32" class="pick-handwrite" fill="var(--brand-blue)" transform="rotate(-3 380 32)">WINNING SLIP</text>
+          <path class="pick-marker" d="M 340 38 Q 410 45, 475 30" filter="url(#rough3)" opacity="0.6"/>
+
+          <!-- ── PICK 1: Match card -->
+          <g transform="translate(20, 50)">
+            <!-- Shadow -->
+            <rect x="2" y="3" width="220" height="58" rx="8" class="pick-shadow"/>
+            <!-- Card -->
+            <rect width="220" height="58" rx="8" fill="var(--bg-card)" stroke="var(--border)" stroke-width="1"/>
+
+            <!-- League badge -->
+            <text x="12" y="14" class="pick-league">⚽ PREMIER LEAGUE · 15:00</text>
+
+            <!-- Teams -->
+            <text x="12" y="32" class="pick-team-name">Man City</text>
+            <text x="103" y="32" class="pick-vs">vs</text>
+            <text x="125" y="32" class="pick-team-name">Arsenal</text>
+
+            <!-- Pick + odds -->
+            <line x1="12" y1="40" x2="208" y2="40" class="pick-divider"/>
+            <text x="12" y="53" fill="var(--text-secondary)" font-family="var(--font)" font-size="11" font-weight="500">Over 2.5 goals</text>
+            <text x="208" y="53" text-anchor="end" class="pick-odds">1.85</text>
+
+            <!-- Handwritten check mark (winning) -->
+            <g filter="url(#rough3)">
+              <path class="pick-check" d="M 232 28 L 244 40 L 268 18"/>
+            </g>
+          </g>
+
+          <!-- ── PICK 2: Match card -->
+          <g transform="translate(260, 78)">
+            <rect x="2" y="3" width="220" height="58" rx="8" class="pick-shadow"/>
+            <rect width="220" height="58" rx="8" fill="var(--bg-card)" stroke="var(--border)" stroke-width="1"/>
+
+            <text x="12" y="14" class="pick-league">⚽ LA LIGA · 17:30</text>
+
+            <text x="12" y="32" class="pick-team-name">Real Madrid</text>
+            <text x="116" y="32" class="pick-vs">vs</text>
+            <text x="138" y="32" class="pick-team-name">Sevilla</text>
+
+            <line x1="12" y1="40" x2="208" y2="40" class="pick-divider"/>
+            <text x="12" y="53" fill="var(--text-secondary)" font-family="var(--font)" font-size="11" font-weight="500">Madrid Win &amp; BTTS</text>
+            <text x="208" y="53" text-anchor="end" class="pick-odds">1.95</text>
+          </g>
+
+          <!-- ── PICK 3: Match card (partially behind for stacking depth) -->
+          <g transform="translate(40, 130)">
+            <rect x="2" y="3" width="220" height="58" rx="8" class="pick-shadow"/>
+            <rect width="220" height="58" rx="8" fill="var(--bg-card)" stroke="var(--border)" stroke-width="1"/>
+
+            <text x="12" y="14" class="pick-league">🏀 NBA · 02:00 GMT</text>
+
+            <text x="12" y="32" class="pick-team-name">Lakers</text>
+            <text x="80" y="32" class="pick-vs">vs</text>
+            <text x="102" y="32" class="pick-team-name">Warriors</text>
+
+            <line x1="12" y1="40" x2="208" y2="40" class="pick-divider"/>
+            <text x="12" y="53" fill="var(--text-secondary)" font-family="var(--font)" font-size="11" font-weight="500">LAL +4.5</text>
+            <text x="208" y="53" text-anchor="end" class="pick-odds">1.91</text>
+
+            <!-- Check on this one too -->
+            <g filter="url(#rough3)">
+              <path class="pick-check" d="M 270 28 L 282 40 L 306 18"/>
+            </g>
+          </g>
+
+          <!-- Combined odds badge — circled with hand-drawn marker -->
+          <g transform="translate(310, 168)">
+            <!-- Hand-drawn circle around the odds -->
+            <ellipse cx="60" cy="38" rx="78" ry="32" class="pick-marker" filter="url(#rough3)"/>
+            <ellipse cx="60" cy="38" rx="72" ry="28" class="pick-marker" filter="url(#rough3)" opacity="0.4"/>
+
+            <!-- The big number -->
+            <text x="60" y="32" text-anchor="middle" fill="var(--brand-blue)" font-family="var(--font-mono)" font-size="11" font-weight="700" letter-spacing="0.08em">COMBINED</text>
+            <text x="60" y="58" text-anchor="middle" fill="var(--brand-blue)" font-family="var(--font-mono)" font-size="28" font-weight="700" letter-spacing="-0.03em">5.12</text>
+          </g>
+
+          <!-- Tier label top-left -->
+          <g transform="translate(20, 14)">
+            <rect width="90" height="26" rx="13" fill="var(--brand-blue)"/>
+            <text x="45" y="18" text-anchor="middle" fill="white" font-family="var(--font-mono)" font-size="10" font-weight="700" letter-spacing="0.08em">5 ODDS</text>
+            <text x="45" y="32" text-anchor="middle" fill="white" font-family="var(--font-mono)" font-size="8" font-weight="600" letter-spacing="0.06em" opacity="0.85">AM SLIP</text>
+          </g>
+
+          <!-- Live indicator -->
+          <g transform="translate(120, 14)">
+            <circle cx="6" cy="14" r="4" fill="var(--green)">
+              <animate attributeName="opacity" values="1;0.3;1" dur="1.8s" repeatCount="indefinite"/>
+            </circle>
+            <text x="16" y="18" fill="var(--green)" font-family="var(--font-mono)" font-size="10" font-weight="700" letter-spacing="0.08em">LIVE NOW</text>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Body -->
+      <div class="product-body">
+        <div class="product-eyebrow-row">
+          <span class="product-icon-sm">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 010 20M12 2a14.5 14.5 0 000 20M2 12h20"/></svg>
+          </span>
+          <span class="product-eyebrow">cmvng Sports</span>
+        </div>
+        <h3>Daily sports<br>betting codes</h3>
+        <p>Curated daily codes from verified analysts. AM &amp; PM drops. Pick your risk tier.</p>
+        <ul class="product-features">
+          <li><span class="feat-check"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></span> 2 / 3 / 5 / 10 / 100 odds tiers</li>
+          <li><span class="feat-check"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></span> AM + PM daily drops</li>
+          <li><span class="feat-check"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></span> Grand Audit weekly pack</li>
+        </ul>
+        <div class="product-cta">
+          <span class="product-price"><strong>Free</strong> to <strong>150 USDC</strong>/mo</span>
+          <span class="product-arrow">Explore <span>→</span></span>
+        </div>
       </div>
     </a>
   </div>
